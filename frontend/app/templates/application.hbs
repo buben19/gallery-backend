@@ -1,0 +1,28 @@
+{{#bs-navbar class='navbar-fixed-top' as |navbar|}}
+  <div class="container">
+    <div class="navbar-header">
+      {{#navbar.toggle}}
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      {{/navbar.toggle}}
+    </div>
+
+    {{#navbar.content}}
+      {{#navbar.nav as |nav|}}
+      {{/navbar.nav}}
+
+      {{#navbar.nav class="navbar-right" as |nav|}}
+        {{#if session.isAuthenticated}}
+        {{else}}
+          {{#nav.item}}{{#nav.link-to "login"}}Login{{/nav.link-to}}{{/nav.item}}
+        {{/if}}
+      {{/navbar.nav}}
+    {{/navbar.content}}
+  </div>
+{{/bs-navbar}}
+
+test
+
+{{outlet}}
