@@ -1,2 +1,2 @@
 #!/bin/sh
-exec ./docker-run.sh ng serve --host 0.0.0.0 $@
+exec ./ng.sh serve --host 0.0.0.0 $@
