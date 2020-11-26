@@ -169,20 +169,13 @@
                         </goals>
                     </execution>
 
-<!--                    <execution>-->
-<!--                        <id>bower install</id>-->
-<!--                        <goals>-->
-<!--                            <goal>bower</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-
                     <execution>
-                        <id>ember build</id>
+                        <id>npm build</id>
                         <goals>
-                            <goal>ember</goal>
+                            <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>build --output-path ../target/classes/static</arguments>
+                            <arguments>run build</arguments>
                         </configuration>
                     </execution>
                 </executions>
