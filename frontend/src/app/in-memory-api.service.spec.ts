@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { InMemoryImageService } from './in-memory-image.service';
+import { InMemoryApiService } from './in-memory-api.service';
 
-describe('InMemoryImageService', () => {
-  let service: InMemoryImageService;
+describe('InMemoryApiService', () => {
+  let service: InMemoryApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(InMemoryImageService);
+    service = TestBed.inject(InMemoryApiService);
   });
 
   it('should be created', () => {

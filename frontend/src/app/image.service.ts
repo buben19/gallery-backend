@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { Image } from './image'
+import { Image } from './model/image'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
 
-  private url = 'api/images';
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   getAll(): Observable<Image[]> {
-    return this.http.get<Image[]>(this.url);
+    return this.http.get<Image[]>('api/images');
   }
 }

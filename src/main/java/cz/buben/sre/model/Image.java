@@ -1,15 +1,17 @@
 package cz.buben.sre.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Data
+@Builder
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Table(name = "users")
 public class Image {
 
@@ -21,7 +23,7 @@ public class Image {
 
     private String path;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private User owner;
 }
