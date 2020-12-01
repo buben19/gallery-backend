@@ -2,75 +2,29 @@ package cz.buben.sre.repository
 
 import cz.buben.sre.model.User
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.repository.CrudRepository
 import spock.lang.Specification
 
+import javax.persistence.PersistenceException
+import javax.validation.ConstraintViolationException
 import java.time.Instant
 
-@SpringBootTest
+@DataJpaTest
 class UserRepositorySpecification extends Specification {
 
     @Autowired
     UserRepository repository
 
+    @Autowired
+    TestEntityManager entityManager
+
+    User user
+
     def setup() {
         repository.deleteAll()
-    }
-
-    def "context loads"() {
-        expect:
-        repository
-    }
-
-    def "implements CrudRepository"() {
-        expect:
-        repository instanceof CrudRepository
-    }
-
-    def "some fields are mandatory"() {
-        given:
-        def user = new User()
-
-        when:
-        repository.save(user)
-
-        then:
-        thrown(RuntimeException)
-
-        when: "Set login field."
-        user.setLogin('test-login')
-        repository.save(user)
-
-        then:
-        thrown(RuntimeException)
-
-        when: "Set password field."
-        user.setPassword('password')
-        repository.save(user)
-
-        then:
-        thrown(RuntimeException)
-
-        when: "Set email field."
-        user.setEmail('user@example.com')
-        repository.save(user)
-
-        then:
-        thrown(RuntimeException)
-
-        when: "Set created instant"
-        user.setCreated(Instant.EPOCH)
-        def save = repository.save(user)
-
-        then:
-        save && save.id
-    }
-
-    def "user can be found by login"() {
-        when: "Create user."
-        def user = repository.save(new User(
+        user = repository.save(new User(
                 firstName: 'name',
                 lastName: 'surename',
                 email: 'user@example.com',
@@ -78,10 +32,84 @@ class UserRepositorySpecification extends Specification {
                 password: 'password',
                 created: Instant.EPOCH
         ))
+        entityManager.flush()
+        entityManager.clear()
+    }
+
+    def cleanup() {
+        repository.deleteAll()
+    }
+
+    def "context loads"() {
+        expect:
+        repository
+        entityManager
+    }
+
+    def "implements CrudRepository"() {
+        expect:
+        repository instanceof CrudRepository
+    }
+
+    def "database contains one user"() {
+        when:
+        def count = repository.count()
 
         then:
-        user && user.getId()
+        count == 1
 
+        when:
+        def all = repository.findAll()
+
+        then:
+        all == [user]
+    }
+
+    def "login is required"() {
+        when:
+        user.setLogin(null)
+        repository.save(user)
+        entityManager.flush()
+
+        then:
+        thrown(ConstraintViolationException)
+        entityManager.clear()
+    }
+
+    def "password is required"() {
+        when:
+        user.setPassword(null)
+        repository.save(user)
+        entityManager.flush()
+
+        then:
+        thrown(ConstraintViolationException)
+        entityManager.clear()
+    }
+
+    def "email is required"() {
+        when:
+        user.setEmail(null)
+        repository.save(user)
+        entityManager.flush()
+
+        then:
+        thrown(ConstraintViolationException)
+        entityManager.clear()
+    }
+
+    def "created instant is required"() {
+        when:
+        user.setCreated(null)
+        repository.save(user)
+        entityManager.flush()
+
+        then:
+        thrown(PersistenceException)
+        entityManager.clear()
+    }
+
+    def "user can be found by login"() {
         when: "Find user."
         def findByLogin = repository.findByLogin('test-login')
 
@@ -91,19 +119,6 @@ class UserRepositorySpecification extends Specification {
     }
 
     def "two users with same login can't be created"() {
-        when: "Create first user."
-        def user = repository.save(new User(
-                firstName: 'name',
-                lastName: 'surename',
-                email: 'user@example.com',
-                login: 'test-login',
-                password: 'password',
-                created: Instant.EPOCH
-        ))
-
-        then:
-        user && user.id
-
         when: "Create exactly same user."
         repository.save(new User(
                 firstName: 'name',
@@ -113,8 +128,10 @@ class UserRepositorySpecification extends Specification {
                 password: 'password',
                 created: Instant.EPOCH
         ))
+        entityManager.flush()
 
         then:
-        thrown(DataIntegrityViolationException)
+        thrown(PersistenceException)
+        entityManager.clear()
     }
 }

@@ -3,15 +3,14 @@ package cz.buben.sre.repository
 import cz.buben.sre.model.Image
 import cz.buben.sre.model.User
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.repository.CrudRepository
-import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
 import java.nio.file.Paths
 import java.time.Instant
 
-@SpringBootTest
+@DataJpaTest
 class ImageRepositorySpecification extends Specification {
 
     @Autowired
@@ -36,7 +35,6 @@ class ImageRepositorySpecification extends Specification {
         imageRepository instanceof CrudRepository
     }
 
-    @Transactional
     def "images can be found by their owner"() {
         when: "Create users."
         def user1 = this.userRepository.save(new User(
