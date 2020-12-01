@@ -23,7 +23,6 @@ class UserRepositorySpecification extends Specification {
     User user
 
     def setup() {
-        repository.deleteAll()
         user = repository.save(new User(
                 firstName: 'name',
                 lastName: 'surename',
@@ -34,10 +33,6 @@ class UserRepositorySpecification extends Specification {
         ))
         entityManager.flush()
         entityManager.clear()
-    }
-
-    def cleanup() {
-        repository.deleteAll()
     }
 
     def "context loads"() {
