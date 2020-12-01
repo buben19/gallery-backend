@@ -14,7 +14,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "images")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -25,6 +25,7 @@ public class User {
 
     private String lastName;
 
+    @Column(unique = true)
     @NotBlank(message = "Login is required")
     private String login;
 

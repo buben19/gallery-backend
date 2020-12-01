@@ -58,11 +58,14 @@ public class AuthenticationService {
 
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.findByToken(token);
+        log.debug("Found verification token: {}", verificationTokenOptional);
         VerificationToken verificationToken = verificationTokenOptional.orElseThrow(
                 () -> new RuntimeException("Verification token not found"));
         User user = verificationToken.getUser();
         user.enable();
         this.userRepository.save(user);
+        log.debug("User {} successfully enabled", user);
         this.verificationTokenRepository.delete(verificationToken);
+        log.debug("Verification token {} deleted from database", verificationToken);
     }
 }

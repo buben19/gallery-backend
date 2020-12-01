@@ -3,19 +3,17 @@ package cz.buben.sre.repository
 import cz.buben.sre.model.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.data.repository.CrudRepository
 import spock.lang.Specification
 
-import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
 
 @SpringBootTest
 class UserRepositorySpecification extends Specification {
 
     @Autowired
     UserRepository repository
-
-    Clock clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault())
 
     def setup() {
         repository.deleteAll()
@@ -26,6 +24,10 @@ class UserRepositorySpecification extends Specification {
         repository
     }
 
+    def "implements CrudRepository"() {
+        expect:
+        repository instanceof CrudRepository
+    }
 
     def "some fields are mandatory"() {
         given:
@@ -59,12 +61,11 @@ class UserRepositorySpecification extends Specification {
         thrown(RuntimeException)
 
         when: "Set created instant"
-        user.setCreated(Instant.now(clock))
+        user.setCreated(Instant.EPOCH)
         def save = repository.save(user)
 
         then:
-        save
-        save.getId()
+        save && save.id
     }
 
     def "user can be found by login"() {
@@ -75,12 +76,11 @@ class UserRepositorySpecification extends Specification {
                 email: 'user@example.com',
                 login: 'test-login',
                 password: 'password',
-                created: Instant.now(clock)
+                created: Instant.EPOCH
         ))
 
         then:
-        user
-        user.getId()
+        user && user.getId()
 
         when: "Find user."
         def findByLogin = repository.findByLogin('test-login')
@@ -88,5 +88,33 @@ class UserRepositorySpecification extends Specification {
         then:
         findByLogin.isPresent()
         findByLogin.get() == user
+    }
+
+    def "two users with same login can't be created"() {
+        when: "Create first user."
+        def user = repository.save(new User(
+                firstName: 'name',
+                lastName: 'surename',
+                email: 'user@example.com',
+                login: 'test-login',
+                password: 'password',
+                created: Instant.EPOCH
+        ))
+
+        then:
+        user && user.id
+
+        when: "Create exactly same user."
+        repository.save(new User(
+                firstName: 'name',
+                lastName: 'surename',
+                email: 'user@example.com',
+                login: 'test-login',
+                password: 'password',
+                created: Instant.EPOCH
+        ))
+
+        then:
+        thrown(DataIntegrityViolationException)
     }
 }

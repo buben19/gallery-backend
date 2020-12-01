@@ -15,7 +15,5 @@ public class ImageDto {
 
     private String title;
 
-    private String path;
-
     private Long owner;
 }

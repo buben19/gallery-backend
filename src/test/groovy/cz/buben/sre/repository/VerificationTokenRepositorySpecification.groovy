@@ -4,6 +4,7 @@ import cz.buben.sre.model.User
 import cz.buben.sre.model.VerificationToken
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.CrudRepository
 import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
@@ -34,6 +35,11 @@ class VerificationTokenRepositorySpecification extends Specification {
         verificationTokenRepository
     }
 
+    def "implements CrudRepository"() {
+        expect:
+        verificationTokenRepository instanceof CrudRepository
+    }
+
     @Transactional
     def "find entity by token"() {
         when:
@@ -51,14 +57,12 @@ class VerificationTokenRepositorySpecification extends Specification {
         ))
 
         then:
-        token
-        token.getId()
+        token && token.id
 
         when:
         def findByToken = verificationTokenRepository.findByToken('token')
 
         then:
-        findByToken.isPresent()
-        findByToken.get() == token
+        findByToken.isPresent() && findByToken.get() == token
     }
 }

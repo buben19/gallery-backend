@@ -37,10 +37,10 @@ class AuthenticationServiceSpecification extends Specification {
                 email: 'user@example.com'
         ))
 
-        then:
+        then: "Encode user password."
         1 * passwordEncoder.encode('password') >> 'encoded-password'
 
-        then:
+        then: "Create new user."
         1 * userRepository.save(new User(
                 login: 'login',
                 password: 'encoded-password',
@@ -87,5 +87,58 @@ class AuthenticationServiceSpecification extends Specification {
                 recipient: 'user@example.com',
                 body: uuid.toString()
         ))
+
+        and: "No other mock invocation."
+        0 * _
+    }
+
+    def "account can be verified"() {
+        given:
+        def token = UUID.randomUUID().toString()
+
+        when:
+        service.verifyAccount(token)
+
+        then:
+        1 * verificationTokenRepository.findByToken(token) >> Optional.of(new VerificationToken(
+                id: 1,
+                token: token,
+                user: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH
+                ),
+                expire: Instant.EPOCH + Period.ofDays(1)
+        ))
+
+        then:
+        1 * userRepository.save(new User(
+                id: 1,
+                login: 'login',
+                password: 'password',
+                email: 'user@example.com',
+                created: Instant.EPOCH,
+                enabled: true
+        ))
+
+        then:
+        1 * verificationTokenRepository.delete(new VerificationToken(
+                id: 1,
+                token: token,
+                user: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH,
+                        enabled: true
+                ),
+                expire: Instant.EPOCH + Period.ofDays(1)
+        ))
+
+        and: "No other mock invocation."
+        0 * _
     }
 }

@@ -56,8 +56,27 @@ class AuthenticationControllerSpecification extends Specification {
     }
 
     def "user signup can fail"() {
-        expect:
-        false
+        when:
+        def resultActions = mvc.perform(post("/api/auth/signup")
+                .content(JsonOutput.toJson([
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com'
+                ]))
+                .contentType(MediaType.APPLICATION_JSON))
+
+        then:
+        1 * authenticationService.signup(new RegistrationRequest(
+                login: 'login',
+                password: 'password',
+                email: 'user@example.com'
+        )) >> {throw new RuntimeException("Authentication failed")}
+
+        and:
+        resultActions.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
+                .andExpect(content().string('User registration failed'))
     }
 
     def "user can be verified"() {
@@ -78,7 +97,19 @@ class AuthenticationControllerSpecification extends Specification {
     }
 
     def "user verification can fail"() {
-        expect:
-        false
+        given:
+        def token = UUID.randomUUID().toString()
+
+        when:
+        def resultActions = this.mvc.perform(get('/api/auth/verify/' + token))
+
+        then:
+        1 * authenticationService.verifyAccount(token) >> {throw new RuntimeException("Authentication failed")}
+
+        and:
+        resultActions.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
+                .andExpect(content().string('User verification failed'))
     }
 }

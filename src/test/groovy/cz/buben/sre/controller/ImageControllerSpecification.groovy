@@ -54,7 +54,6 @@ class ImageControllerSpecification extends Specification {
                         [
                             id: 1,
                             title: 'Test title',
-                            path: null,
                             owner: 1
                         ]
                 ])))
@@ -79,7 +78,6 @@ class ImageControllerSpecification extends Specification {
                 .andExpect(content().json(JsonOutput.toJson([
                             id: 1,
                             title: 'Test title',
-                            path: null,
                             owner: 1
                 ])))
     }

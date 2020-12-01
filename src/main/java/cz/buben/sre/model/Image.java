@@ -1,18 +1,20 @@
 package cz.buben.sre.model;
 
+import cz.buben.sre.model.convert.PathConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.nio.file.Path;
 
 @Data
 @Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
+@Table(name = "images")
 public class Image {
 
     @Id
@@ -21,7 +23,8 @@ public class Image {
 
     private String title;
 
-    private String path;
+    @Convert(converter = PathConverter.class)
+    private Path path;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
