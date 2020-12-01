@@ -1,7 +1,7 @@
 package cz.buben.sre.service
 
 import cz.buben.sre.data.NotificationEmail
-import cz.buben.sre.dto.RegisterRequest
+import cz.buben.sre.dto.RegistrationRequest
 import cz.buben.sre.model.User
 import cz.buben.sre.model.VerificationToken
 import cz.buben.sre.repository.UserRepository
@@ -31,7 +31,7 @@ class AuthenticationServiceSpecification extends Specification {
         def uuid = UUID.randomUUID()
 
         when:
-        service.signup(new RegisterRequest(
+        service.signup(new RegistrationRequest(
                 login: 'login',
                 password: 'password',
                 email: 'user@example.com'

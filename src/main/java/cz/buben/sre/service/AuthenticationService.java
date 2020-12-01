@@ -1,7 +1,7 @@
 package cz.buben.sre.service;
 
 import cz.buben.sre.data.NotificationEmail;
-import cz.buben.sre.dto.RegisterRequest;
+import cz.buben.sre.dto.RegistrationRequest;
 import cz.buben.sre.model.User;
 import cz.buben.sre.model.VerificationToken;
 import cz.buben.sre.repository.UserRepository;
@@ -30,7 +30,7 @@ public class AuthenticationService {
     private final Supplier<UUID> uuidSupplier;
     private final Clock clock;
 
-    public void signup(RegisterRequest request) {
+    public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
                 .login(request.getLogin())
                 .password(this.encoder.encode(request.getPassword()))
