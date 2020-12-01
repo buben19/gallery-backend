@@ -1,5 +1,6 @@
 package cz.buben.sre.controller
 
+import cz.buben.sre.dto.RegistrationRequest
 import cz.buben.sre.service.AuthenticationService
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,11 +11,10 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest
 @ContextConfiguration(classes = MockConfig)
@@ -40,11 +40,45 @@ class AuthenticationControllerSpecification extends Specification {
                         email: 'user@example.com'
                 ]))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
-                .andExpect(content().string('User registration successful'))
 
         then:
+        1 * authenticationService.signup(new RegistrationRequest(
+                login: 'login',
+                password: 'password',
+                email: 'user@example.com'
+        ))
+
+        and:
         resultActions.andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
+                .andExpect(content().string('User registration successful'))
+    }
+
+    def "user signup can fail"() {
+        expect:
+        false
+    }
+
+    def "user can be verified"() {
+        given:
+        def token = UUID.randomUUID().toString()
+
+        when:
+        def resultActions = this.mvc.perform(get('/api/auth/verify/' + token))
+
+        then:
+        1 * authenticationService.verifyAccount(token)
+
+        and:
+        resultActions.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
+                .andExpect(content().string('User successfully verified'))
+    }
+
+    def "user verification can fail"() {
+        expect:
+        false
     }
 }
