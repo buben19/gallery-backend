@@ -3,9 +3,11 @@ package cz.buben.sre.controller;
 import cz.buben.sre.dto.ImageDto;
 import cz.buben.sre.service.ImageService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,9 +29,47 @@ public class ImageController {
         return ResponseEntity.ok(this.imageService.get(id));
     }
 
+    /**
+     * @deprecated Images should not be created like this.
+     */
+    @Deprecated
     @PostMapping("/images")
     public ResponseEntity<Long> createImage(@RequestBody ImageDto image) {
         Long id = this.imageService.create(image);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
+    }
+
+    /**
+     * Upload image file to the server.
+     *
+     * @param image Image payload.
+     *
+     * @return Server response.
+     */
+    @PostMapping("/images/upload")
+    public ResponseEntity<ImageDto> uploadImage(@RequestBody MultipartFile image) {
+        try {
+            ImageDto imageDto = this.imageService.saveImage(image);
+            return ResponseEntity.ok(imageDto);
+        } catch (Throwable ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ImageDto());
+        }
+    }
+
+    /**
+     * Download image from server.
+     *
+     * @param id Image id.
+     *
+     * @return Image file.
+     */
+    @GetMapping("/images/download/{id}")
+    public ResponseEntity<Resource> downloadImage(@PathVariable Long id) {
+        try {
+            Resource resource = this.imageService.loadImage(id);
+            return ResponseEntity.ok(resource);
+        } catch (Throwable ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

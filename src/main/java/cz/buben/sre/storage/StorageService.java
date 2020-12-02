@@ -16,7 +16,7 @@ public interface StorageService {
 
     Path load(String filename);
 
-    Resource loadAsResource(String filename);
+    Resource loadAsResource(Path filename);
 
     void deleteAll();
 }

@@ -1,5 +1,6 @@
 package cz.buben.sre.storage;
 
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unused")
 @Service
+@AllArgsConstructor
 public class FileSystemStorageService implements StorageService {
 
-    private final Path root = Paths.get("./upload");
+    private final Path root;
 
     @Override
     public void init() {
@@ -39,8 +40,7 @@ public class FileSystemStorageService implements StorageService {
             Path destinationFile = this.root.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.root.toAbsolutePath())) {
                 // This is a security check
-                throw new StorageException(
-                        "Cannot store file outside current directory.");
+                throw new StorageException("Cannot store file outside current directory.");
             }
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFile,
@@ -70,18 +70,17 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Resource loadAsResource(String filename) {
+    public Resource loadAsResource(Path file) {
         try {
-            Path file = load(filename);
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new StorageFileNotFoundException("Could not read file: " + filename);
+                throw new StorageFileNotFoundException("Could not read file: " + file);
             }
         }
         catch (MalformedURLException e) {
-            throw new StorageFileNotFoundException("Could not read file: " + filename, e);
+            throw new StorageFileNotFoundException("Could not read file: " + file, e);
         }
     }
 

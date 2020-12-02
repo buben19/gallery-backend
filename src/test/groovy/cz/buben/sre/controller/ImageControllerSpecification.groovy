@@ -86,10 +86,10 @@ class ImageControllerSpecification extends Specification {
     def "create image"() {
         when:
         def resultActions = this.mvc.perform(post("/api/images")
-                .content('''{
-                            "title": "Test title",
-                            "owner": 1
-                        }''')
+                .content(JsonOutput.toJson([
+                        title: 'Test title',
+                        owner: 1
+                ]))
                 .contentType(MediaType.APPLICATION_JSON))
 
         then:

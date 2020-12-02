@@ -1,15 +1,24 @@
 package cz.buben.sre.service;
 
 import cz.buben.sre.data.NotificationEmail;
+import cz.buben.sre.dto.AuthenticationResponse;
+import cz.buben.sre.dto.LoginRequest;
 import cz.buben.sre.dto.RegistrationRequest;
 import cz.buben.sre.model.User;
 import cz.buben.sre.model.VerificationToken;
 import cz.buben.sre.repository.UserRepository;
 import cz.buben.sre.repository.VerificationTokenRepository;
+import cz.buben.sre.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -29,6 +38,8 @@ public class AuthenticationService {
     private final MailService mailService;
     private final Supplier<UUID> uuidSupplier;
     private final Clock clock;
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
 
     public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
@@ -67,5 +78,26 @@ public class AuthenticationService {
         log.debug("User {} successfully enabled", user);
         this.verificationTokenRepository.delete(verificationToken);
         log.debug("Verification token {} deleted from database", verificationToken);
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authentication = this.authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = this.jwtProvider.generateToken(authentication);
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .username(loginRequest.getUsername())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return this.userRepository.findByLogin(principal.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found: " + principal.getUsername()));
     }
 }

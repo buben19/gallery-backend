@@ -6,6 +6,8 @@ import cz.buben.sre.model.User
 import cz.buben.sre.model.VerificationToken
 import cz.buben.sre.repository.UserRepository
 import cz.buben.sre.repository.VerificationTokenRepository
+import cz.buben.sre.security.JwtProvider
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Specification
 
@@ -23,8 +25,10 @@ class AuthenticationServiceSpecification extends Specification {
     MailService mailService = Mock()
     Supplier<UUID> uuidSupplier = Mock()
     Clock clock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault())
+    AuthenticationManager authenticationManager = Mock()
+    JwtProvider jwtProvider = Mock()
     AuthenticationService service = new AuthenticationService(passwordEncoder, userRepository,
-            verificationTokenRepository, mailService, uuidSupplier, clock)
+            verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider)
 
     def "user can signup"() {
         given:
