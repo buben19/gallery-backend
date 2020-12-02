@@ -1,6 +1,8 @@
 package cz.buben.sre.service
 
 import cz.buben.sre.data.NotificationEmail
+import cz.buben.sre.dto.AuthenticationResponse
+import cz.buben.sre.dto.LoginRequest
 import cz.buben.sre.dto.RegistrationRequest
 import cz.buben.sre.model.User
 import cz.buben.sre.model.VerificationToken
@@ -8,6 +10,9 @@ import cz.buben.sre.repository.UserRepository
 import cz.buben.sre.repository.VerificationTokenRepository
 import cz.buben.sre.security.JwtProvider
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.TestingAuthenticationToken
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import spock.lang.Specification
 
@@ -144,5 +149,53 @@ class AuthenticationServiceSpecification extends Specification {
 
         and: "No other mock invocation."
         0 * _
+    }
+
+    def "user can login"() {
+        when:
+        def authenticationResponse = this.service.login(new LoginRequest(
+                username: 'user',
+                password: 'password'
+        ))
+
+        then:
+        1 * authenticationManager.authenticate(new UsernamePasswordAuthenticationToken('user', 'password')) >>
+                new TestingAuthenticationToken('user', 'password', 'ROLE_USER')
+
+         1 * jwtProvider.generateToken(new TestingAuthenticationToken('user', 'password', 'ROLE_USER')) >> 'token'
+
+        authenticationResponse == new AuthenticationResponse(
+                authenticationToken: 'token',
+                username: 'user'
+        )
+    }
+
+    def "get current user"() {
+        given:
+        def principal = org.springframework.security.core.userdetails.User.builder()
+                .username('user')
+                .password('password')
+                .disabled(false)
+                .accountExpired(false)
+                .credentialsExpired(false)
+                .authorities('test-authority')
+                .build()
+        def authentication = new UsernamePasswordAuthenticationToken(principal, null)
+        SecurityContextHolder.getContext().setAuthentication(authentication)
+
+        when:
+        def user = service.getCurrentUser()
+
+        then:
+        1 * userRepository.findByLogin('user') >> Optional.of(new User(
+                id: 1,
+                login: 'user',
+                password: 'password',
+                email: 'user@example.com',
+                created: Instant.EPOCH
+        ))
+
+        and:
+        user
     }
 }

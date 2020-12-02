@@ -3,6 +3,7 @@ package cz.buben.sre.service;
 import cz.buben.sre.dto.ImageDto;
 import cz.buben.sre.mapper.ImageMapper;
 import cz.buben.sre.model.Image;
+import cz.buben.sre.model.User;
 import cz.buben.sre.repository.ImageRepository;
 import cz.buben.sre.storage.StorageService;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
     private final ImageMapper imageMapper;
     private final StorageService storageService;
+    private final AuthenticationService authenticationService;
 
     public List<ImageDto> getAll() {
         return StreamSupport.stream(this.imageRepository.findAll().spliterator(), false)
@@ -41,13 +43,13 @@ public class ImageService {
     }
 
     public ImageDto saveImage(MultipartFile image) {
+        User user = this.authenticationService.getCurrentUser();
         this.storageService.store(image);
         Image save = this.imageRepository.save(Image.builder()
                 .title(image.getOriginalFilename())
                 // TODO: create path on storage.
                 .path(null)
-                // TODO: Get owner.
-                .owner(null)
+                .owner(user)
                 .build());
         return this.imageMapper.imageToDto(save);
     }
