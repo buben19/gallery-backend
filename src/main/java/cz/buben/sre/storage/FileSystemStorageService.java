@@ -12,8 +12,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
 @Service
@@ -32,31 +30,34 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public void store(MultipartFile file) {
+    public void store(Path path, MultipartFile file) {
         try {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
-            Path destinationFile = this.root.resolve(Paths.get(file.getOriginalFilename())).normalize().toAbsolutePath();
-            if (!destinationFile.getParent().equals(this.root.toAbsolutePath())) {
+            Path destinationFile = this.root.resolve(path).normalize().toAbsolutePath();
+            if (!destinationFile.toAbsolutePath().toString().startsWith(this.root.toAbsolutePath().toString())) {
                 // This is a security check
                 throw new StorageException("Cannot store file outside current directory.");
             }
+            Path parent = destinationFile.getParent();
+            if (!Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationFile,
-                        StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(inputStream, destinationFile);
             }
         }
         catch (IOException e) {
-            throw new StorageException("Failed to store file.", e);
+            throw new StorageException("Failed to store file: " + e.getMessage(), e);
         }
     }
 
     @Override
     public Stream<Path> loadAll() {
         try {
-            return Files.walk(this.root, 1)
-                    .filter(path -> !path.equals(this.root))
+            return Files.walk(this.root)
+                    .filter(path -> Files.isRegularFile(path))
                     .map(this.root::relativize);
         }
         catch (IOException e) {
@@ -65,15 +66,15 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Path load(String filename) {
-        return this.root.resolve(filename);
+    public Path load(Path file) {
+        return this.root.resolve(file);
     }
 
     @Override
     public Resource loadAsResource(Path file) {
         try {
-            Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            Resource resource = new UrlResource(this.root.resolve(file).toUri());
+            if (resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
                 throw new StorageFileNotFoundException("Could not read file: " + file);
@@ -86,6 +87,10 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void deleteAll() {
-        FileSystemUtils.deleteRecursively(this.root.toFile());
+        try {
+            FileSystemUtils.deleteRecursively(this.root);
+        } catch (IOException ex) {
+            throw new StorageException("Can't delete storage directory: " + ex.getMessage(), ex);
+        }
     }
 }

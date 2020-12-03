@@ -18,7 +18,7 @@ class StoragePathGeneratorSpecification extends Specification {
         1 * uuidSupplier.get() >> new UUID(1, 2)
 
         and:
-        path == Paths.get('00000000-0000-0001-0000-000000000002')
+        !path.isAbsolute() && path == Paths.get('00000000/0000/0001/0000/000000000002')
     }
 
     def "generate for file with extension"() {
@@ -29,6 +29,6 @@ class StoragePathGeneratorSpecification extends Specification {
         1 * uuidSupplier.get() >> new UUID(1, 2)
 
         and:
-        path == Paths.get('00000000-0000-0001-0000-000000000002.jpg')
+        !path.isAbsolute() && path == Paths.get('00000000/0000/0001/0000/000000000002.jpg')
     }
 }

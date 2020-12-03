@@ -5,6 +5,7 @@ import cz.buben.sre.mapper.ImageMapper
 import cz.buben.sre.model.Image
 import cz.buben.sre.model.User
 import cz.buben.sre.repository.ImageRepository
+import cz.buben.sre.storage.StoragePathGenerator
 import cz.buben.sre.storage.StorageService
 import spock.lang.Specification
 
@@ -17,7 +18,9 @@ class ImageServiceSpecification extends Specification {
     ImageMapper imageMapper = Mock()
     StorageService storageService = Mock()
     AuthenticationService authenticationService = Mock()
-    ImageService imageService = new ImageService(imageRepository, imageMapper, storageService, authenticationService)
+    StoragePathGenerator storagePathGenerator = Mock()
+    ImageService imageService = new ImageService(imageRepository, imageMapper, storageService, authenticationService,
+            storagePathGenerator)
 
     def "get all images" () {
         when:

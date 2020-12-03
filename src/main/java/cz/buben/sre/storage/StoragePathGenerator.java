@@ -19,6 +19,19 @@ public class StoragePathGenerator {
     /**
      * Create path for media file.
      *
+     * @param original Original file as string.
+     *
+     * @return Generated path within archive root directory.
+     */
+    @Nonnull
+    public Path getStoragePath(@Nonnull String original) {
+        Path path = Paths.get(original);
+        return this.getStoragePath(path);
+    }
+
+    /**
+     * Create path for media file.
+     *
      * @param original Original file.
      *
      * @return Generated path within archive root directory.
@@ -27,7 +40,9 @@ public class StoragePathGenerator {
     public Path getStoragePath(@Nonnull Path original) {
         Optional<String> extensionOptional = this.getFileExtension(original);
         StringBuilder builder = new StringBuilder();
-        builder.append(this.uuidSupplier.get().toString());
+        builder.append(this.uuidSupplier.get()
+                .toString()
+                .replaceAll("-", "/"));
         extensionOptional.ifPresent(s -> builder.append(".").append(s));
         return Paths.get(builder.toString());
     }
