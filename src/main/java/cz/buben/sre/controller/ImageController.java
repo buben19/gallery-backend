@@ -5,6 +5,7 @@ import cz.buben.sre.service.ImageService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +51,7 @@ public class ImageController {
     public ResponseEntity<ImageDto> uploadImage(@RequestBody MultipartFile image) {
         try {
             ImageDto imageDto = this.imageService.saveImage(image);
-            return ResponseEntity.ok(imageDto);
+            return new ResponseEntity<>(imageDto, HttpStatus.CREATED);
         } catch (Throwable ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ImageDto());
         }
@@ -67,7 +68,7 @@ public class ImageController {
     public ResponseEntity<Resource> downloadImage(@PathVariable Long id) {
         try {
             Resource resource = this.imageService.loadImage(id);
-            return ResponseEntity.ok(resource);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
         } catch (Throwable ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
