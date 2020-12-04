@@ -19,6 +19,7 @@
         <lombok.version>1.18.6</lombok.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <jwt.verion>0.11.2</jwt.verion>
+        <pitest.version>1.5.2</pitest.version>
     </properties>
 
     <dependencyManagement>
@@ -308,7 +309,7 @@
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
-                <version>1.5.2</version>
+                <version>${pitest.version}</version>
             </plugin>
         </plugins>
     </build>
