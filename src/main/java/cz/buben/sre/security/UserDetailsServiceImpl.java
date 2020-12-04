@@ -1,4 +1,4 @@
-package cz.buben.sre.service;
+package cz.buben.sre.security;
 
 import cz.buben.sre.model.User;
 import cz.buben.sre.repository.UserRepository;

@@ -131,7 +131,8 @@ class ImageControllerSpecification extends Specification {
         )
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().json(JsonOutput.toJson([
@@ -150,6 +151,7 @@ class ImageControllerSpecification extends Specification {
         1 * imageService.loadImage(1) >> new UrlResource(ImageControllerSpecification.getResource('/spring-boot-logo.png'))
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                //.andDo(print()) // Do not print. It prints binary output into console.
     }
 }
