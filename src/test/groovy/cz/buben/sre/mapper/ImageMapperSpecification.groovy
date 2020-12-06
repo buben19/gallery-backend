@@ -5,9 +5,9 @@ import cz.buben.sre.model.Image
 import cz.buben.sre.model.User
 import cz.buben.sre.repository.ImageRepository
 import cz.buben.sre.repository.UserRepository
+import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
 import javax.persistence.EntityNotFoundException
@@ -17,20 +17,14 @@ import java.time.Instant
 @SpringBootTest
 class ImageMapperSpecification extends Specification {
 
-    @Autowired
-    UserRepository userRepository
+    @SpringBean
+    UserRepository userRepository = Mock()
 
-    @Autowired
-    ImageRepository imageRepository
+    @SpringBean
+    ImageRepository imageRepository = Mock()
 
     @Autowired
     ImageMapper mapper
-
-
-    def setup() {
-        userRepository.deleteAll()
-        imageRepository.deleteAll()
-    }
 
     def "context loads"() {
         expect:
@@ -40,73 +34,71 @@ class ImageMapperSpecification extends Specification {
     }
 
     def "map image to DTO"() {
-        when: "Create user."
-        def user = userRepository.save(new User(
-                login: 'user',
-                password: 'password',
-                email: 'user@example.com',
-                created: Instant.EPOCH
-        ))
-
-        then:
-        user && user.id
-
-        when: "Create image."
-        def image = this.imageRepository.save(new Image(
-                title: 'image',
-                path: Paths.get('img/img.jpg'),
-                owner: user,
-        ))
-
-        then:
-        image && image.id
-
         when:
-        def dto = mapper.imageToDto(image)
+        def dto = mapper.imageToDto(new Image(
+                id: 1,
+                title: 'Test title',
+                owner: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH
+                )
+        ))
 
         then:
         dto == new ImageDto(
-                id: image.id,
-                title: 'image',
-                owner: user.id
+                id: 1,
+                title: 'Test title',
+                owner: 1
         )
     }
 
-    @Transactional
     def "map DTO to image"() {
-        when: "Create user."
-        def user = userRepository.save(new User(
-                login: 'user',
+        when:
+        def mapped = mapper.dtoToImage(new ImageDto(
+                id: 1,
+                title: 'Test title',
+                owner: 1
+        ))
+
+        then:
+        1 * imageRepository.findById(1) >> Optional.of(new Image(
+                id: 1,
+                title: 'Test title',
+                path: Paths.get('image.jpg'),
+                owner: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH
+                )))
+
+        and:
+        1 * userRepository.findById(1) >> Optional.of(new User(
+                id: 1,
+                login: 'login',
                 password: 'password',
                 email: 'user@example.com',
                 created: Instant.EPOCH
         ))
 
-        then:
-        user && user.id
-
-        when: "Create image."
-        def image = this.imageRepository.save(new Image(
-                title: 'image',
-                path: Paths.get('img/img.jpg'),
-                owner: user,
-        ))
-
-        then:
-        image && image.id
-
-        when:
-        def mapped = mapper.dtoToImage(new ImageDto(
-                id: image.id,
-                title: 'image',
-                owner: user.id
-        ))
-
-        then:
-        mapped == image
+        and:
+        mapped == new Image(
+                id: 1,
+                title: 'Test title',
+                path: Paths.get('image.jpg'),
+                owner: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH
+                ))
     }
 
-    @Transactional
     def "unknown image throws exception"() {
         when:
         mapper.dtoToImage(new ImageDto(
@@ -116,38 +108,34 @@ class ImageMapperSpecification extends Specification {
         ))
 
         then:
+        1 * imageRepository.findById(1) >> {throw new EntityNotFoundException('Test exception')}
+
+        then:
         thrown(EntityNotFoundException)
     }
 
-    @Transactional
     def "unknown owner throws exception"() {
-        when: "Create user."
-        def user = userRepository.save(new User(
-                login: 'user',
-                password: 'password',
-                email: 'user@example.com',
-                created: Instant.EPOCH
-        ))
-
-        then:
-        user && user.id
-
-        when: "Create image."
-        def image = this.imageRepository.save(new Image(
-                title: 'image',
-                path: Paths.get('img/img.jpg'),
-                owner: user,
-        ))
-
-        then:
-        image && image.id
-
         when:
         mapper.dtoToImage(new ImageDto(
-                id: image.id,
+                id: 1,
                 title: 'image',
-                owner: user.id + 1
+                owner: 1
         ))
+
+        then:
+         1 * imageRepository.findById(1) >> Optional.of(new Image(
+                id: 1,
+                title: 'Test title',
+                path: Paths.get('image.jpg'),
+                owner: new User(
+                        id: 1,
+                        login: 'login',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH
+                )))
+
+        1 * userRepository.findById(1) >> {throw new EntityNotFoundException('Test exception')}
 
         then:
         thrown(EntityNotFoundException)
