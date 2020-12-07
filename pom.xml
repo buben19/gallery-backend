@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>cz.buben</groupId>
-    <artifactId>spring-react-example</artifactId>
+    <artifactId>gallery-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-react-example</name>
+    <name>gallery-backend</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -22,6 +22,8 @@
         <pitest.version>1.5.2</pitest.version>
         <groovy.version>3.0.7</groovy.version>
         <spock.version>2.0-M4-groovy-3.0</spock.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencyManagement>
@@ -192,42 +194,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
-<!--            <plugin>-->
-<!--                <groupId>com.github.eirslett</groupId>-->
-<!--                <artifactId>frontend-maven-plugin</artifactId>-->
-<!--                <version>1.10.3</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>install node and npm</id>-->
-<!--                        <goals>-->
-<!--                            <goal>install-node-and-npm</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-
-<!--                    <execution>-->
-<!--                        <id>npm install</id>-->
-<!--                        <goals>-->
-<!--                            <goal>npm</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-
-<!--                    <execution>-->
-<!--                        <id>npm build</id>-->
-<!--                        <goals>-->
-<!--                            <goal>npm</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <arguments>run build</arguments>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <nodeVersion>v14.15.1</nodeVersion>-->
-<!--                    <installDirectory>target</installDirectory>-->
-<!--                    <workingDirectory>frontend</workingDirectory>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
 
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
