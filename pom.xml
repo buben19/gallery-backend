@@ -29,7 +29,7 @@
             <dependency>
                 <groupId>org.spockframework</groupId>
                 <artifactId>spock-bom</artifactId>
-                <version>2.0-M1-groovy-2.5</version>
+                <version>${spock.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
