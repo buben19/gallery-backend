@@ -290,8 +290,8 @@
                 <configuration>
                     <testPlugin>junit5</testPlugin>
                     <excludedClasses>
-                        <excludedClass>cz.buben.sre.SpringReactExampleApplication</excludedClass>
-                        <excludedClass>cz.buben.sre.configuration.*</excludedClass>
+                        <excludedClass>cz.buben.gallery.SpringReactExampleApplication</excludedClass>
+                        <excludedClass>cz.buben.gallery.configuration.*</excludedClass>
                     </excludedClasses>
                 </configuration>
                 <dependencies>
