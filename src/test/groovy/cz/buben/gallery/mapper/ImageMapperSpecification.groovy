@@ -8,12 +8,14 @@ import cz.buben.gallery.repository.UserRepository
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
 
 import javax.persistence.EntityNotFoundException
 import java.nio.file.Paths
 import java.time.Instant
 
+@ActiveProfiles("test")
 @SpringBootTest
 class ImageMapperSpecification extends Specification {
 
