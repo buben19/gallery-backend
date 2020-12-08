@@ -1,4 +1,4 @@
-package cz.buben.sre;
+package cz.buben.sre.configuration;
 
 import io.micrometer.core.aop.CountedAspect;
 import io.micrometer.core.aop.TimedAspect;

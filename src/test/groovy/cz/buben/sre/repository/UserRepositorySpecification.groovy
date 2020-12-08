@@ -25,7 +25,7 @@ class UserRepositorySpecification extends Specification {
     def setup() {
         user = repository.save(new User(
                 firstName: 'name',
-                lastName: 'surename',
+                lastName: 'surname',
                 email: 'user@example.com',
                 login: 'test-login',
                 password: 'password',
@@ -117,7 +117,7 @@ class UserRepositorySpecification extends Specification {
         when: "Create exactly same user."
         repository.save(new User(
                 firstName: 'name',
-                lastName: 'surename',
+                lastName: 'surname',
                 email: 'user@example.com',
                 login: 'test-login',
                 password: 'password',

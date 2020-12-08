@@ -289,6 +289,10 @@
                 <version>${pitest.version}</version>
                 <configuration>
                     <testPlugin>junit5</testPlugin>
+                    <excludedClasses>
+                        <excludedClass>cz.buben.sre.SpringReactExampleApplication</excludedClass>
+                        <excludedClass>cz.buben.sre.configuration.*</excludedClass>
+                    </excludedClasses>
                 </configuration>
                 <dependencies>
                     <dependency>

@@ -1,4 +1,4 @@
-package cz.buben.sre;
+package cz.buben.sre.configuration;
 
 import cz.buben.sre.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
