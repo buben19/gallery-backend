@@ -34,6 +34,7 @@ public class AdminUserRunner implements CommandLineRunner {
                     .password(this.passwordEncoder.encode("admin"))
                     .email("admin@localhost")
                     .created(Instant.now(this.clock))
+                    .enabled(true)
                     .build());
             log.info("Admin user created: {}", admin);
         }
