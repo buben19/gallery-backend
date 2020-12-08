@@ -9,7 +9,7 @@ import java.time.Clock
 import java.util.function.Supplier
 
 @SpringBootTest
-class SpringReactExampleApplicationSpecification extends Specification {
+class GalleryApplicationSpecification extends Specification {
 
     @Autowired
     Supplier<UUID> uuidSupplier

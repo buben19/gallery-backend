@@ -290,7 +290,7 @@
                 <configuration>
                     <testPlugin>junit5</testPlugin>
                     <excludedClasses>
-                        <excludedClass>cz.buben.gallery.SpringReactExampleApplication</excludedClass>
+                        <excludedClass>cz.buben.gallery.GalleryApplication</excludedClass>
                         <excludedClass>cz.buben.gallery.configuration.*</excludedClass>
                     </excludedClasses>
                 </configuration>

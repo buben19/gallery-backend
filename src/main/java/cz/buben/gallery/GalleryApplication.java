@@ -13,13 +13,13 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 @SpringBootApplication
-public class SpringReactExampleApplication {
+public class GalleryApplication {
 
     @Value("media")
     private String root;
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringReactExampleApplication.class, args);
+        SpringApplication.run(GalleryApplication.class, args);
     }
 
     @Bean
