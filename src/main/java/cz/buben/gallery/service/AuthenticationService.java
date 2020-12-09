@@ -41,6 +41,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
 
+    @Transactional
     public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
                 .login(request.getLogin())
@@ -67,6 +68,7 @@ public class AuthenticationService {
         this.mailService.sendMail(notificationEmail);
     }
 
+    @Transactional
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.findByToken(token);
         log.debug("Found verification token: {}", verificationTokenOptional);
@@ -80,6 +82,7 @@ public class AuthenticationService {
         log.debug("Verification token {} deleted from database", verificationToken);
     }
 
+    @Transactional
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
