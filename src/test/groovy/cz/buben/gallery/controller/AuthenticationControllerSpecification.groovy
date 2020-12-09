@@ -1,5 +1,8 @@
 package cz.buben.gallery.controller
 
+import com.fasterxml.jackson.annotation.JsonValue
+import cz.buben.gallery.dto.AuthenticationResponse
+import cz.buben.gallery.dto.LoginRequest
 import cz.buben.gallery.dto.RegistrationRequest
 import cz.buben.gallery.service.AuthenticationService
 import groovy.json.JsonOutput
@@ -49,7 +52,8 @@ class AuthenticationControllerSpecification extends Specification {
         ))
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
                 .andExpect(content().string('User registration successful'))
@@ -73,7 +77,8 @@ class AuthenticationControllerSpecification extends Specification {
         )) >> {throw new RuntimeException("Authentication failed")}
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
                 .andExpect(content().string('User registration failed'))
@@ -90,7 +95,8 @@ class AuthenticationControllerSpecification extends Specification {
         1 * authenticationService.verifyAccount(token)
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
                 .andExpect(content().string('User successfully verified'))
@@ -107,9 +113,39 @@ class AuthenticationControllerSpecification extends Specification {
         1 * authenticationService.verifyAccount(token) >> {throw new RuntimeException("Authentication failed")}
 
         and:
-        resultActions.andDo(print())
+        resultActions
+                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE + ';charset=ISO-8859-1'))
                 .andExpect(content().string('User verification failed'))
+    }
+
+    def "user can login"() {
+        when:
+        def resultActions = mvc.perform(post("/api/auth/login")
+                .content(JsonOutput.toJson([
+                        login: 'login',
+                        password: 'password',
+                ]))
+                .contentType(MediaType.APPLICATION_JSON))
+
+        then:
+        1 * authenticationService.login(new LoginRequest(
+                login: 'login',
+                password: 'password'
+        )) >> new AuthenticationResponse(
+                authenticationToken: 'token',
+                username: 'login'
+        )
+
+        and:
+        resultActions
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().json(JsonOutput.toJson([
+                        authenticationToken: 'token',
+                        username: 'login'
+                ])))
     }
 }

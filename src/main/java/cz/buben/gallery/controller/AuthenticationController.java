@@ -40,7 +40,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
-        return this.authenticationService.login(loginRequest);
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            AuthenticationResponse login = this.authenticationService.login(loginRequest);
+            return ResponseEntity.ok(login);
+        } catch (Throwable ex) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
