@@ -86,13 +86,13 @@ public class AuthenticationService {
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        loginRequest.getLogin(),
+                        loginRequest.getUsername(),
                         loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = this.jwtProvider.generateToken(authentication);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
-                .username(loginRequest.getLogin())
+                .username(loginRequest.getUsername())
                 .build();
     }
 

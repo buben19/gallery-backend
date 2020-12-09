@@ -154,7 +154,7 @@ class AuthenticationServiceSpecification extends Specification {
     def "user can login"() {
         when:
         def authenticationResponse = this.service.login(new LoginRequest(
-                login: 'user',
+                username: 'user',
                 password: 'password'
         ))
 

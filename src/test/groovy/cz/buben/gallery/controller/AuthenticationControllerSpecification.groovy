@@ -1,6 +1,5 @@
 package cz.buben.gallery.controller
 
-import com.fasterxml.jackson.annotation.JsonValue
 import cz.buben.gallery.dto.AuthenticationResponse
 import cz.buben.gallery.dto.LoginRequest
 import cz.buben.gallery.dto.RegistrationRequest
@@ -124,14 +123,14 @@ class AuthenticationControllerSpecification extends Specification {
         when:
         def resultActions = mvc.perform(post("/api/auth/login")
                 .content(JsonOutput.toJson([
-                        login: 'login',
+                        username: 'login',
                         password: 'password',
                 ]))
                 .contentType(MediaType.APPLICATION_JSON))
 
         then:
         1 * authenticationService.login(new LoginRequest(
-                login: 'login',
+                username: 'login',
                 password: 'password'
         )) >> new AuthenticationResponse(
                 authenticationToken: 'token',
