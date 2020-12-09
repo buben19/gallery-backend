@@ -43,7 +43,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        authenticationManagerBuilder.userDetailsService(this.userDetailsService)
+        authenticationManagerBuilder
+                .userDetailsService(this.userDetailsService)
                 .passwordEncoder(this.passwordEncoder());
     }
 
