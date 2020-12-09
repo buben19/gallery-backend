@@ -1,9 +1,9 @@
 package cz.buben.gallery.security;
 
-import cz.buben.gallery.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +31,7 @@ public class JwtProvider {
     public String generateToken(Authentication authentication) {
         User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
-                .setSubject(principal.getLogin())
+                .setSubject(principal.getUsername())
                 .signWith(this.getPrivateKey())
                 .compact();
     }

@@ -88,8 +88,10 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
+        log.debug("Login authentication: {}", authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = this.jwtProvider.generateToken(authentication);
+        log.debug("Authentication token: {}", token);
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
                 .username(loginRequest.getUsername())

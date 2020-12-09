@@ -43,8 +43,10 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
         try {
             AuthenticationResponse login = this.authenticationService.login(loginRequest);
+            log.debug("Login result: {}", login);
             return ResponseEntity.ok(login);
         } catch (Throwable ex) {
+            log.error("Login error: {}", ex.getMessage(), ex);
             return ResponseEntity.badRequest().body(null);
         }
     }
