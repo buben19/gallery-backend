@@ -4,10 +4,12 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 
@@ -15,11 +17,11 @@ import java.security.cert.CertificateException;
 @Service
 public class BasicKeyProvider implements KeyProvider {
 
-    @Value("pcks12")
+    @Value("jks")
     private String keyStoreType;
 
-    @Value("keystore.jks")
-    private String keyStoreFile;
+    @Value("${gallery.keyStoreFile:keystore.jks}")
+    private Resource keyStoreFile;
 
     @Value("secret")
     private String keyStorePassword;
@@ -36,12 +38,12 @@ public class BasicKeyProvider implements KeyProvider {
     @PostConstruct
     public void init() {
         assert StringUtils.isNotBlank(this.keyStoreType) : "Key store type must be set.";
-        assert StringUtils.isNotBlank(this.keyStoreFile) : "Key store file must be set.";
+        assert this.keyStoreFile.exists() : "Key store file doesn't exists.";
         assert StringUtils.isNotBlank(this.entryName) : "Entry name must be set.";
         assert this.keyPassword != null : "Key password can't be null";
         try {
             this.keyStore = KeyStore.getInstance(this.keyStoreType);
-            FileInputStream stream = new FileInputStream(new File(this.keyStoreFile));
+            InputStream stream = this.keyStoreFile.getInputStream();
             this.keyStore.load(stream, this.keyStorePassword == null ? null : this.keyPassword.toCharArray());
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException ex) {
             throw new SecurityException("Exception occurred while loading keystore", ex);
