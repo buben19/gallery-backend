@@ -6,7 +6,9 @@ import cz.buben.gallery.dto.RegistrationRequest;
 import cz.buben.gallery.service.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -45,6 +47,8 @@ public class AuthenticationController {
             AuthenticationResponse login = this.authenticationService.login(loginRequest);
             log.debug("Login result: {}", login);
             return ResponseEntity.ok(login);
+        } catch (BadCredentialsException ex) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Throwable ex) {
             log.error("Login error: {}", ex.getMessage(), ex);
             return ResponseEntity.badRequest().body(null);
