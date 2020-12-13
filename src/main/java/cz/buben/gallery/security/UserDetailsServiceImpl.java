@@ -25,20 +25,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = this.repository.findByLogin(username);
-        User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("No user found with login: " + username));
-
-
-        UserBuilder userBuilder = org.springframework.security.core.userdetails.User.builder();
-        return userBuilder.username(user.getLogin())
-                .password(user.getPassword())
-                .disabled(!user.isEnabled())
-                .accountExpired(false)
-                .credentialsExpired(false)
-                .authorities(this.getAuthorities("USER"))
-                .build();
-    }
-
-    private Collection<? extends GrantedAuthority> getAuthorities(String role) {
-        return singletonList(new SimpleGrantedAuthority(role));
+        return userOptional.orElseThrow(() -> new UsernameNotFoundException("No user found with login: " + username));
     }
 }

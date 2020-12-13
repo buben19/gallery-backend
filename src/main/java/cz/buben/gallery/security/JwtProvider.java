@@ -1,10 +1,10 @@
 package cz.buben.gallery.security;
 
+import cz.buben.gallery.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 @SuppressWarnings("WeakerAccess")
