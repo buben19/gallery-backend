@@ -5,34 +5,23 @@ import cz.buben.gallery.model.Image
 import cz.buben.gallery.model.User
 import cz.buben.gallery.repository.ImageRepository
 import cz.buben.gallery.repository.UserRepository
-import org.spockframework.spring.SpringBean
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import org.mapstruct.factory.Mappers
 import spock.lang.Specification
 
 import javax.persistence.EntityNotFoundException
 import java.nio.file.Paths
 import java.time.Instant
 
-@ActiveProfiles("test")
-@SpringBootTest
 class ImageMapperSpecification extends Specification {
 
-    @SpringBean
     UserRepository userRepository = Mock()
-
-    @SpringBean
     ImageRepository imageRepository = Mock()
-
-    @Autowired
     ImageMapper mapper
 
-    def "context loads"() {
-        expect:
-        userRepository
-        imageRepository
-        mapper
+    def setup() {
+        mapper = Mappers.getMapper(ImageMapper.class)
+        mapper.setUserRepository(userRepository)
+        mapper.setImageRepository(imageRepository)
     }
 
     def "map image to DTO"() {
