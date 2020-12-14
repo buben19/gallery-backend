@@ -5,6 +5,7 @@ import cz.buben.gallery.model.Image;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.repository.ImageRepository;
 import cz.buben.gallery.repository.UserRepository;
+import lombok.Setter;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,7 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityNotFoundException;
 import java.nio.file.Path;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"unused"})
+@Setter
 @Mapper(componentModel = "spring")
 public abstract class ImageMapper {
 
