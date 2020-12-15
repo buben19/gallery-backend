@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.repository.CrudRepository
+import org.springframework.security.test.context.support.WithMockUser
 import spock.lang.Specification
 
 import javax.persistence.PersistenceException
 import javax.validation.ConstraintViolationException
 import java.time.Instant
 
+@SuppressWarnings("GroovyAssignabilityCheck")
 @DataJpaTest
 class UserRepositorySpecification extends Specification {
 

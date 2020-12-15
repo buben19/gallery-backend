@@ -1,10 +1,12 @@
 package cz.buben.gallery.configuration;
 
-import net.sf.ehcache.Ehcache;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.acls.AclPermissionEvaluator;
 import org.springframework.security.acls.domain.*;
 import org.springframework.security.acls.jdbc.BasicLookupStrategy;
 import org.springframework.security.acls.jdbc.JdbcMutableAclService;
@@ -17,9 +19,9 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 
 import javax.sql.DataSource;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class AclConfiguration extends GlobalMethodSecurityConfiguration {
 
     @Bean
@@ -70,5 +72,13 @@ public class AclConfiguration extends GlobalMethodSecurityConfiguration {
     @Bean
     public EhCacheManagerFactoryBean aclCacheManager() {
         return new EhCacheManagerFactoryBean();
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(DataSource dataSource) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        AclPermissionEvaluator permissionEvaluator = new AclPermissionEvaluator(this.aclService(dataSource));
+        expressionHandler.setPermissionEvaluator(permissionEvaluator);
+        return expressionHandler;
     }
 }
