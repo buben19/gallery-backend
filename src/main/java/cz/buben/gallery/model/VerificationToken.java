@@ -18,7 +18,7 @@ import java.time.Instant;
 public class VerificationToken {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "verification_tokens_sequence")
     private Long id;
 
     @NotBlank(message = "Token is required")

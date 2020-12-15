@@ -18,7 +18,7 @@ import java.nio.file.Path;
 public class Image {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "images_sequence")
     private Long id;
 
     private String title;

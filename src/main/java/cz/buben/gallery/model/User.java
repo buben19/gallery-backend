@@ -24,7 +24,7 @@ import static java.util.Collections.singletonList;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "users_sequence")
     private Long id;
 
     private String firstName;
@@ -46,6 +46,13 @@ public class User implements UserDetails {
 
     @Builder.Default
     private boolean enabled = false;
+
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles;
 
     public void enable() {
         this.setEnabled(true);
