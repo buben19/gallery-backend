@@ -1,13 +1,11 @@
 package cz.buben.gallery.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
@@ -47,6 +45,8 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean enabled = false;
 
+    // TODO: This may be bug.
+    @EqualsAndHashCode.Exclude
     @ManyToMany
     @JoinTable(
             name = "users_roles",
