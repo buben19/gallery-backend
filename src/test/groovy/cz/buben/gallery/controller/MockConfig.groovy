@@ -1,7 +1,7 @@
 package cz.buben.gallery.controller
 
+import cz.buben.gallery.security.AuthenticationService
 import cz.buben.gallery.security.JwtProvider
-import cz.buben.gallery.service.AuthenticationService
 import cz.buben.gallery.service.ImageService
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean

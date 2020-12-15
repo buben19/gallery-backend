@@ -1,4 +1,4 @@
-package cz.buben.gallery.service;
+package cz.buben.gallery.security;
 
 import cz.buben.gallery.data.NotificationEmail;
 import cz.buben.gallery.dto.AuthenticationResponse;
@@ -8,7 +8,7 @@ import cz.buben.gallery.model.User;
 import cz.buben.gallery.model.VerificationToken;
 import cz.buben.gallery.repository.UserRepository;
 import cz.buben.gallery.repository.VerificationTokenRepository;
-import cz.buben.gallery.security.JwtProvider;
+import cz.buben.gallery.service.MailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @Slf4j
+@Transactional
 @Service
 @AllArgsConstructor
 public class AuthenticationService {
@@ -41,7 +42,6 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
 
-    @Transactional
     public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
                 .login(request.getLogin())
@@ -68,7 +68,6 @@ public class AuthenticationService {
         this.mailService.sendMail(notificationEmail);
     }
 
-    @Transactional
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.findByToken(token);
         log.debug("Found verification token: {}", verificationTokenOptional);
@@ -82,7 +81,6 @@ public class AuthenticationService {
         log.debug("Verification token {} deleted from database", verificationToken);
     }
 
-    @Transactional
     public AuthenticationResponse login(LoginRequest loginRequest) {
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

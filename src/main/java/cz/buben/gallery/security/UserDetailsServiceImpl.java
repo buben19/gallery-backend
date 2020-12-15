@@ -3,18 +3,12 @@ package cz.buben.gallery.security;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Optional;
-
-import static java.util.Collections.singletonList;
 
 @Service
 @AllArgsConstructor

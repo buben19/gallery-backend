@@ -3,7 +3,7 @@ package cz.buben.gallery.controller;
 import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
-import cz.buben.gallery.service.AuthenticationService;
+import cz.buben.gallery.security.AuthenticationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

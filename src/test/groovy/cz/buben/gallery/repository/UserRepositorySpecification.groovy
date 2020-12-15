@@ -1,13 +1,10 @@
 package cz.buben.gallery.repository
 
 import cz.buben.gallery.model.User
-import org.hibernate.collection.internal.PersistentBag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.repository.CrudRepository
-import org.springframework.security.test.context.support.WithMockUser
-import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
 import javax.persistence.PersistenceException

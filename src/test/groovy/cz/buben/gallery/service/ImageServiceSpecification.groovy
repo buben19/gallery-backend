@@ -5,6 +5,7 @@ import cz.buben.gallery.mapper.ImageMapper
 import cz.buben.gallery.model.Image
 import cz.buben.gallery.model.User
 import cz.buben.gallery.repository.ImageRepository
+import cz.buben.gallery.security.AuthenticationService
 import cz.buben.gallery.storage.StoragePathGenerator
 import cz.buben.gallery.storage.StorageService
 import spock.lang.Specification

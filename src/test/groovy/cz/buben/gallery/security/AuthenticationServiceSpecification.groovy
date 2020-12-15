@@ -1,4 +1,4 @@
-package cz.buben.gallery.service
+package cz.buben.gallery.security
 
 import cz.buben.gallery.data.NotificationEmail
 import cz.buben.gallery.dto.AuthenticationResponse
@@ -8,7 +8,9 @@ import cz.buben.gallery.model.User
 import cz.buben.gallery.model.VerificationToken
 import cz.buben.gallery.repository.UserRepository
 import cz.buben.gallery.repository.VerificationTokenRepository
+import cz.buben.gallery.security.AuthenticationService
 import cz.buben.gallery.security.JwtProvider
+import cz.buben.gallery.service.MailService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
