@@ -1,4 +1,4 @@
-create sequence roles_sequence start with 1 increment by 1;
+create sequence roles_sequence start with 100 increment by 1;
 
 create table roles (
     id bigint not null primary key,
