@@ -1,4 +1,4 @@
-create sequence images_sequence start with 1 increment by 1;
+create sequence image_sequence start with 1 increment by 1;
 
 create table images (
     id bigint not null primary key,
