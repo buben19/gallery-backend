@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 @Transactional
 @AllArgsConstructor

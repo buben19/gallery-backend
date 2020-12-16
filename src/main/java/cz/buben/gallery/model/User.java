@@ -5,10 +5,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.annotation.Nonnull;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import static java.util.Collections.singletonList;
 
@@ -80,5 +84,12 @@ public class User implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
+    }
+
+    @Nonnull
+    public Collection<Privilege> getPrivileges() {
+        Set<Privilege> privileges = new HashSet<>();
+        this.roles.forEach(role -> privileges.addAll(role.getPrivileges()));
+        return privileges;
     }
 }

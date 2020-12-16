@@ -5,6 +5,8 @@ import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
 import cz.buben.gallery.dto.RefreshTokenRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
+import cz.buben.gallery.model.Privilege;
+import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.model.VerificationToken;
 import cz.buben.gallery.repository.UserRepository;
@@ -27,6 +29,7 @@ import java.time.Period;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -88,22 +91,25 @@ public class AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
-        log.debug("Login authentication: {}", authentication);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = this.jwtProvider.generateToken(authentication);
-        log.debug("Authentication token: {}", token);
+        JwtProvider.JwtResult result = this.jwtProvider.generateToken(authentication);
+        String refreshToken = this.refreshTokenService.generate();
+        User user = (User) authentication.getPrincipal();
         return AuthenticationResponse.builder()
-                .authenticationToken(token)
+                .authenticationToken(result.getToken())
+                .refreshToken(refreshToken)
+                .expiresAt(result.getExpiration())
                 .username(loginRequest.getUsername())
-                // TODO: Set other fields.
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .privileges(user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList()))
                 .build();
     }
 
     public AuthenticationResponse refresh(RefreshTokenRequest refreshTokenRequest) {
         this.refreshTokenService.validate(refreshTokenRequest.getToken());
-        String token = this.jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
+        JwtProvider.JwtResult result = this.jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
         return AuthenticationResponse.builder()
-                .authenticationToken(token)
+                .authenticationToken(result.getToken())
                 .username(refreshTokenRequest.getUsername())
                 // TODO: Set other fields.
                 .build();
