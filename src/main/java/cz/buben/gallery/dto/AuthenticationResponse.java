@@ -15,4 +15,5 @@ import java.util.Collection;
 public class AuthenticationResponse {
 
     private String jwt;
+    private String refreshToken;
 }
