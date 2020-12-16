@@ -3,6 +3,7 @@ package cz.buben.gallery.security;
 import cz.buben.gallery.data.NotificationEmail;
 import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
+import cz.buben.gallery.dto.RefreshTokenRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.model.VerificationToken;
@@ -41,6 +42,7 @@ public class AuthenticationService {
     private final Clock clock;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
@@ -93,6 +95,17 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .authenticationToken(token)
                 .username(loginRequest.getUsername())
+                // TODO: Set other fields.
+                .build();
+    }
+
+    public AuthenticationResponse refresh(RefreshTokenRequest refreshTokenRequest) {
+        this.refreshTokenService.validate(refreshTokenRequest.getToken());
+        String token = this.jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .username(refreshTokenRequest.getUsername())
+                // TODO: Set other fields.
                 .build();
     }
 

@@ -17,7 +17,7 @@ import java.util.Collection;
 public class Role {
 
     @Id
-    @GeneratedValue(generator = "roles_sequence")
+    @GeneratedValue(generator = "role_sequence")
     private Long id;
 
     @Column(unique = true)

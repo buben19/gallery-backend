@@ -34,8 +34,10 @@ class AuthenticationServiceSpecification extends Specification {
     Clock clock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault())
     AuthenticationManager authenticationManager = Mock()
     JwtProvider jwtProvider = Mock()
+    RefreshTokenService refreshTokenService = Mock()
     AuthenticationService service = new AuthenticationService(passwordEncoder, userRepository,
-            verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider)
+            verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider,
+            refreshTokenService)
 
     def "user can signup"() {
         given:

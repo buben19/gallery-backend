@@ -2,6 +2,7 @@ package cz.buben.gallery.controller;
 
 import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
+import cz.buben.gallery.dto.RefreshTokenRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
 import cz.buben.gallery.security.AuthenticationService;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -53,5 +56,21 @@ public class AuthenticationController {
             log.error("Login error: {}", ex.getMessage(), ex);
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationResponse> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        try {
+            AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
+            return ResponseEntity.ok(refresh);
+        } catch (Throwable ex) {
+            log.error("Refresh error: {}", ex.getMessage(), ex);
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        throw new UnsupportedOperationException("Not implemented yet.");
     }
 }

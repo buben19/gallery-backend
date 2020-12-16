@@ -17,7 +17,7 @@ import java.util.Collection;
 public class Privilege {
 
     @Id
-    @GeneratedValue(generator = "privileges_sequence")
+    @GeneratedValue(generator = "privilege_sequence")
     private Long id;
 
     @Column(unique = true)

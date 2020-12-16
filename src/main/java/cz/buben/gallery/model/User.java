@@ -21,7 +21,7 @@ import static java.util.Collections.singletonList;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(generator = "users_sequence")
+    @GeneratedValue(generator = "user_sequence")
     private Long id;
 
     private String firstName;
