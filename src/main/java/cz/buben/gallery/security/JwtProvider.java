@@ -32,9 +32,10 @@ public class JwtProvider {
         Instant now = Instant.now(this.clock);
         Instant expiration = now.plus(this.tokenDurationSupplier.get());
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .setSubject(String.valueOf(user.getId()))
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiration))
+                .claim("name", user.getUsername())
                 .claim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .claim("privileges", user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList()))
                 .signWith(this.keyProvider.getPrivateKey())
@@ -42,13 +43,13 @@ public class JwtProvider {
     }
 
     @Nonnull
-    public String getUsernameFromJwt(@Nonnull String token) {
+    public String getUserId(@Nonnull String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(this.keyProvider.getPublicKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+        return claims.get("name", String.class);
     }
 
     @Nonnull
