@@ -86,6 +86,11 @@ public class User implements UserDetails {
         return true;
     }
 
+    /**
+     * Get set of all privileges provided by assigned roles.
+     *
+     * @return Set of assigned privileges.
+     */
     @Nonnull
     public Collection<Privilege> getPrivileges() {
         Set<Privilege> privileges = new HashSet<>();
