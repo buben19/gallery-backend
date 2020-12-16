@@ -1,13 +1,13 @@
 package cz.buben.gallery.security;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.Nonnull;
@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -29,8 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @Nonnull HttpServletRequest request,
             @Nonnull HttpServletResponse response,
             @Nonnull FilterChain filterChain) throws ServletException, IOException {
-        String jwt = this.getJwtFromRequest(request);
-        if (StringUtils.hasText(jwt) && this.jwtProvider.validateToken(jwt)) {
+        Optional<String> jwtOptional = this.getJwtFromRequest(request);
+        if (jwtOptional.isPresent()) {
+            String jwt = jwtOptional.get();
             String username = this.jwtProvider.getUsernameFromJwt(jwt);
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -43,11 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring("Bearer ".length());
+    private Optional<String> getJwtFromRequest(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if (StringUtils.isNotBlank(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
+            return Optional.of(authorizationHeader.substring("Bearer ".length()));
         }
-        return bearerToken;
+        return Optional.empty();
     }
 }

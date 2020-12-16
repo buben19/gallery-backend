@@ -5,8 +5,6 @@ import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
 import cz.buben.gallery.dto.RefreshTokenRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
-import cz.buben.gallery.model.Privilege;
-import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.model.VerificationToken;
 import cz.buben.gallery.repository.UserRepository;
@@ -29,7 +27,6 @@ import java.time.Period;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional
@@ -45,7 +42,6 @@ public class AuthenticationService {
     private final Clock clock;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private final RefreshTokenService refreshTokenService;
 
     public void signup(RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
@@ -92,27 +88,14 @@ public class AuthenticationService {
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        JwtProvider.JwtResult result = this.jwtProvider.generateToken(authentication);
-        String refreshToken = this.refreshTokenService.generate();
-        User user = (User) authentication.getPrincipal();
+        String token = this.jwtProvider.generateToken(authentication);
         return AuthenticationResponse.builder()
-                .authenticationToken(result.getToken())
-                .refreshToken(refreshToken)
-                .expiresAt(result.getExpiration())
-                .username(loginRequest.getUsername())
-                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
-                .privileges(user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList()))
+                .jwt(token)
                 .build();
     }
 
     public AuthenticationResponse refresh(RefreshTokenRequest refreshTokenRequest) {
-        this.refreshTokenService.validate(refreshTokenRequest.getToken());
-        JwtProvider.JwtResult result = this.jwtProvider.generateTokenWithUsername(refreshTokenRequest.getUsername());
-        return AuthenticationResponse.builder()
-                .authenticationToken(result.getToken())
-                .username(refreshTokenRequest.getUsername())
-                // TODO: Set other fields.
-                .build();
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Transactional(readOnly = true)

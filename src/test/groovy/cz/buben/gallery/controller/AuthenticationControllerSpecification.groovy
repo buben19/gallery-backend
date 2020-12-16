@@ -133,8 +133,7 @@ class AuthenticationControllerSpecification extends Specification {
                 username: 'login',
                 password: 'password'
         )) >> new AuthenticationResponse(
-                authenticationToken: 'token',
-                username: 'login'
+                jwt: 'token'
         )
 
         and:
@@ -143,8 +142,7 @@ class AuthenticationControllerSpecification extends Specification {
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(content().json(JsonOutput.toJson([
-                        authenticationToken: 'token',
-                        username: 'login'
+                        jwt: 'token'
                 ])))
     }
 }

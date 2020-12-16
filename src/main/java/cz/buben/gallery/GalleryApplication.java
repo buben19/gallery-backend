@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -35,5 +36,10 @@ public class GalleryApplication {
     @Bean
     public Path storageRoot() {
         return Paths.get(this.root);
+    }
+
+    @Bean
+    public Supplier<Duration> jwtTokenDuration() {
+        return () -> Duration.ofMinutes(30);
     }
 }
