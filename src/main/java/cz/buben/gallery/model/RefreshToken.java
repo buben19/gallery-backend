@@ -59,6 +59,6 @@ public class RefreshToken {
         if (expiration == null) {
             expiration = this.created.plus(duration);
         }
-        return expiration.isBefore(Instant.now(clock));
+        return Instant.now(clock).isBefore(expiration);
     }
 }
