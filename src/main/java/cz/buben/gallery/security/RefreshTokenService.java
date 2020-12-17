@@ -37,6 +37,7 @@ public class RefreshTokenService {
         this.expirationSupplier = expirationSupplier;
     }
 
+    // TODO: Should this method accept user?
     @Nonnull
     public RefreshToken create(@Nonnull Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -73,5 +74,14 @@ public class RefreshTokenService {
             this.refreshTokenRepository.delete(refreshToken);
             throw new RuntimeException("Token expired");
         }
+    }
+
+    /**
+     * Delete refresh token for given user.
+     *
+     * @param user User which token should be deleted for.
+     */
+    public void delete(@Nonnull User user) {
+        this.refreshTokenRepository.deleteByUser(user);
     }
 }

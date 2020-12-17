@@ -24,24 +24,14 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody RegistrationRequest request) {
-        try {
-            this.authenticationService.signup(request);
-            return ResponseEntity.ok("User registration successful");
-        } catch (Throwable ex) {
-            log.error("User registration failed: {}", ex.getMessage(), ex);
-            return ResponseEntity.badRequest().body("User registration failed");
-        }
+        this.authenticationService.signup(request);
+        return ResponseEntity.ok("User registration successful");
     }
 
     @GetMapping("/verify/{token}")
     public ResponseEntity<String> verifyAccount(@PathVariable String token) {
-        try {
-            this.authenticationService.verifyAccount(token);
-            return ResponseEntity.ok("User successfully verified");
-        } catch (Throwable ex) {
-            log.error("User verification failed: {}", ex.getMessage(), ex);
-            return ResponseEntity.badRequest().body("User verification failed");
-        }
+        this.authenticationService.verifyAccount(token);
+        return ResponseEntity.ok("User successfully verified");
     }
 
     @PostMapping("/login")
@@ -52,26 +42,18 @@ public class AuthenticationController {
             return ResponseEntity.ok(login);
         } catch (BadCredentialsException ex) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (Throwable ex) {
-            log.error("Login error: {}", ex.getMessage(), ex);
-            return ResponseEntity.badRequest().body(null);
         }
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        try {
-            AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
-            return ResponseEntity.ok(refresh);
-        } catch (Throwable ex) {
-            // TODO: Catch token expiration.
-            log.error("Refresh error: {}", ex.getMessage(), ex);
-            return ResponseEntity.badRequest().body(null);
-        }
+        AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
+        return ResponseEntity.ok(refresh);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public ResponseEntity<?> logout() {
+        this.authenticationService.logout();
+        return ResponseEntity.ok().body(null);
     }
 }

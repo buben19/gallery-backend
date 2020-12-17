@@ -110,10 +110,17 @@ public class AuthenticationService {
                 .build();
     }
 
+    public void logout() {
+        User user = this.getCurrentUser();
+        this.refreshTokenService.delete(user);
+    }
+
     @Transactional(readOnly = true)
     public User getCurrentUser() {
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
-                getContext().getAuthentication().getPrincipal();
+        org.springframework.security.core.userdetails.User principal =
+                (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getPrincipal();
         return this.userRepository.findByLogin(principal.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found: " + principal.getUsername()));
     }
