@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -29,12 +28,17 @@ public class JwtProvider {
     @Nonnull
     public String generateToken(@Nonnull Authentication authentication) {
         User user = (User) authentication.getPrincipal();
+        return this.generateToken(user);
+    }
+
+    @Nonnull
+    public String generateToken(@Nonnull User user) {
         Instant now = Instant.now(this.clock);
         Instant expiration = now.plus(this.tokenDurationSupplier.get());
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getId()))
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration))
+                .claim("iat", now.toEpochMilli())
+                .claim("exp", expiration.toEpochMilli())
                 .claim("name", user.getUsername())
                 .claim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .claim("privileges", user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList()))
@@ -43,24 +47,12 @@ public class JwtProvider {
     }
 
     @Nonnull
-    public String getUserId(@Nonnull String token) {
+    public String getUserLogin(@Nonnull String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(this.keyProvider.getPublicKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claims.get("name", String.class);
-    }
-
-    @Nonnull
-    public String generateTokenWithUsername(@Nonnull String username) {
-        Instant now = Instant.now(this.clock);
-        Instant expiration = now.plus(this.tokenDurationSupplier.get());
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration))
-                .signWith(this.keyProvider.getPrivateKey())
-                .compact();
     }
 }

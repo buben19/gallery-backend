@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Deprecated
 @Data
 @Builder
 @AllArgsConstructor
@@ -13,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class RefreshTokenRequest {
 
     private String token;
-    private String username;
 }

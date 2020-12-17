@@ -5,6 +5,7 @@ import cz.buben.gallery.dto.AuthenticationResponse;
 import cz.buben.gallery.dto.LoginRequest;
 import cz.buben.gallery.dto.RefreshTokenRequest;
 import cz.buben.gallery.dto.RegistrationRequest;
+import cz.buben.gallery.model.RefreshToken;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.model.VerificationToken;
 import cz.buben.gallery.repository.UserRepository;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nonnull;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.Period;
@@ -42,8 +44,9 @@ public class AuthenticationService {
     private final Clock clock;
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
-    public void signup(RegistrationRequest request) {
+    public void signup(@Nonnull RegistrationRequest request) {
         User user = this.userRepository.save(User.builder()
                 .login(request.getLogin())
                 .password(this.encoder.encode(request.getPassword()))
@@ -69,7 +72,7 @@ public class AuthenticationService {
         this.mailService.sendMail(notificationEmail);
     }
 
-    public void verifyAccount(String token) {
+    public void verifyAccount(@Nonnull String token) {
         Optional<VerificationToken> verificationTokenOptional = this.verificationTokenRepository.findByToken(token);
         log.debug("Found verification token: {}", verificationTokenOptional);
         VerificationToken verificationToken = verificationTokenOptional.orElseThrow(
@@ -82,20 +85,29 @@ public class AuthenticationService {
         log.debug("Verification token {} deleted from database", verificationToken);
     }
 
-    public AuthenticationResponse login(LoginRequest loginRequest) {
+    @Nonnull
+    public AuthenticationResponse login(@Nonnull LoginRequest loginRequest) {
         Authentication authentication = this.authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = this.jwtProvider.generateToken(authentication);
+        String jwt = this.jwtProvider.generateToken(authentication);
+        RefreshToken refreshToken = this.refreshTokenService.create(authentication);
         return AuthenticationResponse.builder()
-                .jwt(token)
+                .jwt(jwt)
+                .refreshToken(refreshToken.getToken())
                 .build();
     }
 
-    public AuthenticationResponse refresh(RefreshTokenRequest refreshTokenRequest) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    @Nonnull
+    public AuthenticationResponse refresh(@Nonnull RefreshTokenRequest refreshTokenRequest) {
+        RefreshToken refreshToken = this.refreshTokenService.update(refreshTokenRequest.getToken());
+        String jwt = this.jwtProvider.generateToken(refreshToken.getUser());
+        return AuthenticationResponse.builder()
+                .jwt(jwt)
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 
     @Transactional(readOnly = true)

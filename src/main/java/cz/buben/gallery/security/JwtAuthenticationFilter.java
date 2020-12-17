@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Optional<String> jwtOptional = this.getJwtFromRequest(request);
         if (jwtOptional.isPresent()) {
             String jwt = jwtOptional.get();
-            String username = this.jwtProvider.getUserId(jwt);
+            String username = this.jwtProvider.getUserLogin(jwt);
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails,

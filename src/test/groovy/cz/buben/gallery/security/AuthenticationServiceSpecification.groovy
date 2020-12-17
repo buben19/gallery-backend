@@ -4,6 +4,7 @@ import cz.buben.gallery.data.NotificationEmail
 import cz.buben.gallery.dto.AuthenticationResponse
 import cz.buben.gallery.dto.LoginRequest
 import cz.buben.gallery.dto.RegistrationRequest
+import cz.buben.gallery.model.RefreshToken
 import cz.buben.gallery.model.User
 import cz.buben.gallery.model.VerificationToken
 import cz.buben.gallery.repository.UserRepository
@@ -34,8 +35,10 @@ class AuthenticationServiceSpecification extends Specification {
     Clock clock = Clock.fixed(Instant.ofEpochMilli(0), ZoneId.systemDefault())
     AuthenticationManager authenticationManager = Mock()
     JwtProvider jwtProvider = Mock()
+    RefreshTokenService refreshTokenService = Mock()
     AuthenticationService service = new AuthenticationService(passwordEncoder, userRepository,
-            verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider)
+            verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider,
+            refreshTokenService)
 
     def "user can signup"() {
         given:
@@ -164,10 +167,26 @@ class AuthenticationServiceSpecification extends Specification {
         1 * authenticationManager.authenticate(new UsernamePasswordAuthenticationToken('user', 'password')) >>
                 new TestingAuthenticationToken('user', 'password', 'ROLE_USER')
 
-         1 * jwtProvider.generateToken(new TestingAuthenticationToken('user', 'password', 'ROLE_USER')) >> 'token'
+        1 * jwtProvider.generateToken(new TestingAuthenticationToken('user', 'password', 'ROLE_USER')) >> 'jwt-token'
+
+        1 * refreshTokenService.create(new TestingAuthenticationToken('user', 'password', 'ROLE_USER')) >> new RefreshToken(
+                id: 1,
+                token: 'refresh-token',
+                created: Instant.EPOCH,
+                user: new User(
+                        id: 1,
+                        login: 'user',
+                        password: 'password',
+                        email: 'user@example.com',
+                        created: Instant.EPOCH,
+                        enabled: true,
+                        roles: []
+                )
+        )
 
         authenticationResponse == new AuthenticationResponse(
-                jwt: 'token'
+                jwt: 'jwt-token',
+                refreshToken: 'refresh-token'
         )
     }
 

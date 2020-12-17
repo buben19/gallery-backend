@@ -64,6 +64,7 @@ public class AuthenticationController {
             AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
             return ResponseEntity.ok(refresh);
         } catch (Throwable ex) {
+            // TODO: Catch token expiration.
             log.error("Refresh error: {}", ex.getMessage(), ex);
             return ResponseEntity.badRequest().body(null);
         }
