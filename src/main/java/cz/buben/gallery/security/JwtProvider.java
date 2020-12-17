@@ -4,12 +4,15 @@ import cz.buben.gallery.model.Privilege;
 import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import javax.xml.crypto.Data;
+import java.sql.Date;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,8 +50,8 @@ public class JwtProvider {
         Instant expiration = now.plus(this.tokenDurationSupplier.get());
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getId()))
-                .claim("iat", now.toEpochMilli())
-                .claim("exp", expiration.toEpochMilli())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiration))
                 .claim("name", user.getUsername())
                 .claim("roles", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
                 .claim("privileges", user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList()))

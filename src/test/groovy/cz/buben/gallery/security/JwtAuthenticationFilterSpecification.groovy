@@ -1,6 +1,7 @@
 package cz.buben.gallery.security
 
 import cz.buben.gallery.model.User
+import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.test.web.servlet.MockMvc
@@ -24,7 +25,10 @@ class JwtAuthenticationFilterSpecification extends Specification {
             .addFilter(filter)
             .build()
 
-    def "test filter"() {
+    def "filter will authenticate user"() {
+        expect:
+        SecurityContextHolder.getContext().getAuthentication() == null
+
         when:
         def resultActions = this.mvc.perform(get('/test')
                 .header('Authorization', 'Bearer token'))
@@ -52,6 +56,18 @@ class JwtAuthenticationFilterSpecification extends Specification {
                 email: 'user@example.com',
                 enabled: true
         )
+    }
+
+    def "filter throws exception when JWT expires"() {
+        when:
+        this.mvc.perform(get('/test')
+                .header('Authorization', 'Bearer token'))
+
+        then:
+        1 * jwtProvider.getUserLogin('token') >> { throw new ExpiredJwtException(null, null, 'Test message') }
+
+        then:
+        thrown(ExpiredJwtException)
     }
 
     @RestController
