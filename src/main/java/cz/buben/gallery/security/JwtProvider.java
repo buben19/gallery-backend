@@ -5,7 +5,7 @@ import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,24 @@ import java.time.Instant;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static cz.buben.gallery.Qualifiers.JWT_DURATION_SUPPLIER;
+
 @SuppressWarnings("WeakerAccess")
 @Service
-@AllArgsConstructor
 public class JwtProvider {
 
     private final KeyProvider keyProvider;
     private final Clock clock;
     private final Supplier<Duration> tokenDurationSupplier;
+
+    public JwtProvider(
+            KeyProvider keyProvider,
+            Clock clock,
+            @Qualifier(JWT_DURATION_SUPPLIER) Supplier<Duration> tokenDurationSupplier) {
+        this.keyProvider = keyProvider;
+        this.clock = clock;
+        this.tokenDurationSupplier = tokenDurationSupplier;
+    }
 
     @Nonnull
     public String generateToken(@Nonnull Authentication authentication) {

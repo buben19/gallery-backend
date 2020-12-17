@@ -12,6 +12,9 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static cz.buben.gallery.Qualifiers.JWT_DURATION_SUPPLIER;
+import static cz.buben.gallery.Qualifiers.REFRESH_TOKEN_DURATION_SUPPLIER;
+
 @SuppressWarnings("unused")
 @SpringBootApplication
 public class GalleryApplication {
@@ -38,8 +41,13 @@ public class GalleryApplication {
         return Paths.get(this.root);
     }
 
-    @Bean
-    public Supplier<Duration> jwtTokenDuration() {
+    @Bean(JWT_DURATION_SUPPLIER)
+    public Supplier<Duration> jwtDuration() {
         return () -> Duration.ofMinutes(30);
+    }
+
+    @Bean(REFRESH_TOKEN_DURATION_SUPPLIER)
+    public Supplier<Duration> refreshTokenDuration() {
+        return () -> Duration.ofDays(14);
     }
 }

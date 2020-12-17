@@ -3,7 +3,7 @@ package cz.buben.gallery.security;
 import cz.buben.gallery.model.RefreshToken;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.repository.RefreshTokenRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +15,27 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import static cz.buben.gallery.Qualifiers.REFRESH_TOKEN_DURATION_SUPPLIER;
+
 @SuppressWarnings("WeakerAccess")
 @Service
-@AllArgsConstructor
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final Supplier<UUID> uuidSupplier;
     private final Clock clock;
     private final Supplier<Duration> expirationSupplier;
+
+    public RefreshTokenService(
+            RefreshTokenRepository refreshTokenRepository,
+            Supplier<UUID> uuidSupplier,
+            Clock clock,
+            @Qualifier(REFRESH_TOKEN_DURATION_SUPPLIER) Supplier<Duration> expirationSupplier) {
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.uuidSupplier = uuidSupplier;
+        this.clock = clock;
+        this.expirationSupplier = expirationSupplier;
+    }
 
     @Nonnull
     public RefreshToken create(@Nonnull Authentication authentication) {
