@@ -25,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtProvider jwtProvider;
     private UserDetailsService userDetailsService;
 
+    // TODO: Check for JWT expiration.
     @Override
     protected void doFilterInternal(
             @Nonnull HttpServletRequest request,
