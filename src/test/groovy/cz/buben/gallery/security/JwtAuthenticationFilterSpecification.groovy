@@ -25,6 +25,14 @@ class JwtAuthenticationFilterSpecification extends Specification {
             .addFilter(filter)
             .build()
 
+    def setup() {
+        SecurityContextHolder.clearContext()
+    }
+
+    def cleanup() {
+        SecurityContextHolder.clearContext()
+    }
+
     def "filter will authenticate user"() {
         expect:
         SecurityContextHolder.getContext().getAuthentication() == null

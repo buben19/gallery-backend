@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import javax.persistence.EntityNotFoundException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.Period;
@@ -100,6 +101,7 @@ public class AuthenticationService {
     }
 
     @Nonnull
+    @Transactional(noRollbackFor = {SecurityException.class, EntityNotFoundException.class})
     public AuthenticationResponse refresh(@Nonnull RefreshTokenRequest refreshTokenRequest) {
         RefreshToken refreshToken = this.refreshTokenService.update(refreshTokenRequest.getToken());
         String jwt = this.jwtProvider.generateToken(refreshToken.getUser());

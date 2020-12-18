@@ -53,8 +53,18 @@ public class RefreshTokenService {
                 .build());
     }
 
+    /**
+     * Update refresh token for its associated user.
+     *
+     * @param token Token string.
+     *
+     * @return New refresh token entity.
+     *
+     * @throws SecurityException When refresh token was found in database but expired.
+     * @throws EntityNotFoundException When refresh token is not present in database.
+     */
     @Nonnull
-    public RefreshToken update(@Nonnull String token) {
+    public RefreshToken update(@Nonnull String token) throws SecurityException, EntityNotFoundException {
         RefreshToken refreshToken = this.refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find token: " + token));
         if (refreshToken.isValid(this.expirationSupplier.get(), this.clock)) {
@@ -72,7 +82,7 @@ public class RefreshTokenService {
                     .build());
         } else {
             this.refreshTokenRepository.delete(refreshToken);
-            throw new RuntimeException("Token expired");
+            throw new SecurityException("Token expired");
         }
     }
 

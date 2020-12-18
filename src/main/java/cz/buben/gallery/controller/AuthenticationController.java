@@ -12,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
+@SuppressWarnings("unused")
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -47,8 +49,13 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
-        return ResponseEntity.ok(refresh);
+        try {
+            AuthenticationResponse refresh = this.authenticationService.refresh(refreshTokenRequest);
+            return ResponseEntity.ok(refresh);
+        } catch (SecurityException | EntityNotFoundException ex) {
+            log.info("Can't refresh token: {}", ex.getMessage());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping("/logout")
