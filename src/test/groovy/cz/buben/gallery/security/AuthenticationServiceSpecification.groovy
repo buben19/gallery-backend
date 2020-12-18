@@ -40,6 +40,10 @@ class AuthenticationServiceSpecification extends Specification {
             verificationTokenRepository, mailService, uuidSupplier, clock, authenticationManager, jwtProvider,
             refreshTokenService)
 
+    def setup() {
+        SecurityContextHolder.createEmptyContext()
+    }
+
     def "user can signup"() {
         given:
         def uuid = UUID.randomUUID()
@@ -192,14 +196,13 @@ class AuthenticationServiceSpecification extends Specification {
 
     def "get current user"() {
         given:
-        def principal = org.springframework.security.core.userdetails.User.builder()
-                .username('user')
-                .password('password')
-                .disabled(false)
-                .accountExpired(false)
-                .credentialsExpired(false)
-                .authorities('test-authority')
-                .build()
+        def principal = new User(
+                id: 1,
+                login: 'user',
+                password: 'password',
+                email: 'user@example.com',
+                created: Instant.EPOCH
+        )
         def authentication = new UsernamePasswordAuthenticationToken(principal, null)
         SecurityContextHolder.getContext().setAuthentication(authentication)
 
@@ -207,15 +210,6 @@ class AuthenticationServiceSpecification extends Specification {
         def user = service.getCurrentUser()
 
         then:
-        1 * userRepository.findByLogin('user') >> Optional.of(new User(
-                id: 1,
-                login: 'user',
-                password: 'password',
-                email: 'user@example.com',
-                created: Instant.EPOCH
-        ))
-
-        and:
-        user
+        user == principal
     }
 }
