@@ -5,6 +5,7 @@ import cz.buben.gallery.model.Privilege;
 import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.repository.RoleRepository;
+import cz.buben.gallery.repository.UserRepository;
 import lombok.Setter;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -24,32 +25,37 @@ import java.util.stream.Collectors;
 public abstract class UserMapper {
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     @Mapping(target = "roles", expression = "java(getListOfRoles(user))")
-    @Mapping(target = "privileges", expression = "java(getListOfPrivileges(user))")
     public abstract UserDto userToDto(User user);
 
     @InheritInverseConfiguration
     @Mapping(target = "roles", expression = "java(findRoles(user.getRoles()))")
+    @Mapping(target = "password", expression = "java(findPassword(user.getId()))")
     public abstract User dtoToUser(UserDto user);
 
     @Nonnull
-    protected List<String> getListOfRoles(@Nonnull User user) {
-        return user.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+    protected List<Long> getListOfRoles(@Nonnull User user) {
+        return user.getRoles().stream().map(Role::getId).collect(Collectors.toList());
     }
 
     @Nonnull
-    protected List<String> getListOfPrivileges(@Nonnull User user) {
-        return user.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList());
-    }
-
-    @Nonnull
-    protected Collection<Role> findRoles(@Nonnull List<String> roles) {
+    protected Collection<Role> findRoles(@Nonnull List<Long> roles) {
         List<Role> roleList = new LinkedList<>();
-        roles.forEach(roleName -> this.roleRepository.findByName(roleName)
+        roles.forEach(roleId -> this.roleRepository.findById(roleId)
                 .map(roleList::add)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find role: " + roleName)));
+                .orElseThrow(() -> new EntityNotFoundException("Can't find role with id: " + roleId)));
         return roleList;
+    }
+
+    @Nonnull
+    protected String findPassword(@Nonnull Long userId) {
+        return this.userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: " + userId))
+                .getPassword();
     }
 }

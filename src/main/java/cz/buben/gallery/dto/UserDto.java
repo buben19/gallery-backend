@@ -21,6 +21,5 @@ public class UserDto {
     private String email;
     private Instant created;
     private boolean enabled;
-    private List<String> roles;
-    private List<String> privileges;
+    private List<Long> roles;
 }
