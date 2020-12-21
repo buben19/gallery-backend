@@ -23,11 +23,6 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<UserDto>> getAll() {
-        try {
-            return ResponseEntity.ok(this.userService.getAll());
-        } catch (Throwable ex) {
-            log.error("Get all users error: {}", ex.getMessage(), ex);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        return ResponseEntity.ok(this.userService.getAll());
     }
 }

@@ -1,7 +1,6 @@
 package cz.buben.gallery.mapper;
 
 import cz.buben.gallery.dto.UserDto;
-import cz.buben.gallery.model.Privilege;
 import cz.buben.gallery.model.Role;
 import cz.buben.gallery.model.User;
 import cz.buben.gallery.repository.RoleRepository;
@@ -19,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused"})
 @Setter
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
@@ -30,16 +29,18 @@ public abstract class UserMapper {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Mapping(target = "roles", expression = "java(getListOfRoles(user))")
-    public abstract UserDto userToDto(User user);
+    @Nonnull
+    @Mapping(target = "roles", expression = "java(getRoles(user))")
+    public abstract UserDto userToDto(@Nonnull User user);
 
+    @Nonnull
     @InheritInverseConfiguration
     @Mapping(target = "roles", expression = "java(findRoles(user.getRoles()))")
     @Mapping(target = "password", expression = "java(findPassword(user.getId()))")
-    public abstract User dtoToUser(UserDto user);
+    public abstract User dtoToUser(@Nonnull UserDto user);
 
     @Nonnull
-    protected List<Long> getListOfRoles(@Nonnull User user) {
+    protected List<Long> getRoles(@Nonnull User user) {
         return user.getRoles().stream().map(Role::getId).collect(Collectors.toList());
     }
 
