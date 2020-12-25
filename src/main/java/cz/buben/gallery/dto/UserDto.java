@@ -18,6 +18,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String login;
+    private String password;
     private String email;
     private Instant created;
     private boolean enabled;
