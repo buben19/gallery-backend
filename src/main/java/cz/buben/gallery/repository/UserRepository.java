@@ -10,11 +10,5 @@ import java.util.Optional;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    @PreAuthorize("hasPermission(#user, 'WRITE')")
-    @Nonnull
-    @Override
-    <S extends User> S save(@Nonnull @Param("user") S user);
-
-
     Optional<User> findByLogin(String login);
 }
